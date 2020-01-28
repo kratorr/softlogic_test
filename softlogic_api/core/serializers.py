@@ -23,3 +23,16 @@ class PersonUUIDSeriazlier(serializers.ModelSerializer):
     class Meta:
         model = Person
         fields = ['id']
+
+
+class PersonSerialiserUpdate(serializers.ModelSerializer):
+
+    class Meta:
+        model = Person
+        fields = ['vector']
+        read_only_fields = ['id', 'first_name', 'last_name']
+
+    def update(self, instance, validated_data):
+        instance.vector = validated_data.get('vector', instance.vector)
+        instance.save()
+        return instance

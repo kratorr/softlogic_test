@@ -1,11 +1,12 @@
 from django.shortcuts import get_object_or_404
+from django.http.response import HttpResponseBadRequest
 
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import status
 
 from core.models import Person
-from core.serializers import PersonSerializer , PersonUUIDSeriazlier
+from core.serializers import PersonSerializer , PersonUUIDSeriazlier, PersonSerialiserUpdate
 
 
 class PersonViewSet(viewsets.ModelViewSet):
@@ -24,25 +25,21 @@ class PersonViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data['id'], status=status.HTTP_201_CREATED, headers=headers)
+        return Response(serializer.data['id'], status=status.HTTP_201_CREATED)
 
     def retrieve(self, request, pk=None):
-        queryset = Person.objects.all()
-        person = get_object_or_404(queryset, pk=pk)
+        person = get_object_or_404(self.queryset, pk=pk)
         serializer = PersonSerializer(person)
         return Response(serializer.data)
-'''
+    
     def update(self, request, pk=None):
-        pass
+        instance = get_object_or_404(self.queryset, pk=pk)  
+        serializer = PersonSerialiserUpdate(instance, request.data, partial=True)
+        if serializer.is_valid(raise_exception=True):
+            self.perform_update(serializer)
 
-    def partial_update(self, request, pk=None):
-        pass
-
-    def destroy(self, request, pk=None):
-        pass
-'''
-
+        return Response({'Ok':'ok'})
+  
 
 
 '''
