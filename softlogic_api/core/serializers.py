@@ -26,7 +26,6 @@ class PersonUUIDSeriazlier(serializers.ModelSerializer):
 
 
 class PersonSerialiserUpdate(serializers.ModelSerializer):
-
     class Meta:
         model = Person
         fields = ['vector']
