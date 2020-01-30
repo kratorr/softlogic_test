@@ -52,7 +52,7 @@ $ python3 manage.py runserver
 
 ### Request
 
-`GET /person/id`
+`GET /person/id/`
 
     curl --request GET 'http://localhost:8000/person/ecebd15e-fa62-43ce-9fe9-9bf95c81921b/' -H 'Content-Type: application/json'
 
@@ -71,6 +71,6 @@ $ python3 manage.py runserver
 
 ### Request
 
-`DELETE /thing/id`
+`DELETE /person/id/`
 
     curl --request DELETE 'http://localhost:8000/person/ecebd15e-fa62-43ce-9fe9-9bf95c81921b/' -H 'Content-Type: application/json'
