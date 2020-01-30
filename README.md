@@ -83,4 +83,4 @@ $ python3 manage.py runserver
 
 `GET /compare/?person1=id&person2=id`
 
-    curl --request GET 'http://localhost:8000/compare/?person1=ecebd15e-fa62-43ce-9fe9-9bf95c81921b&person2=ecebd15e-fa62-43ce-9fe9-9bf95c81921b& -H 'Content-Type: application/json'
+    curl --request GET 'http://localhost:8000/person/5af44f20-ec06-437f-8423-467ed9407971/compare/5af44f20-ec06-437f-8423-467ed940797c/' -H 'Content-Type: application/json'
