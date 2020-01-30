@@ -1,4 +1,4 @@
-from core.models import Person
+from person.models import Person
 from rest_framework import serializers
 
 

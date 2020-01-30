@@ -2,20 +2,21 @@ from django.shortcuts import get_object_or_404
 from django.http.response import HttpResponseBadRequest
 from django.core.exceptions import ValidationError
 from django.utils.datastructures import MultiValueDictKeyError
+from django.http import Http404
 
 from rest_framework import viewsets, status, exceptions
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from rest_framework.exceptions import APIException
+from rest_framework.exceptions import APIException, NotFound
 from rest_framework.views import APIView
 
 from PIL import Image
 
-from core.utils import get_string_vector, compare_vector
-from core.models import Person
-from core.serializers import PersonSerializer , PersonUUIDSeriazlier, PersonSerialiserUpdate
+from person.utils import get_string_vector, compare_vector
+from person.models import Person
+from person.serializers import PersonSerializer , PersonUUIDSeriazlier, PersonSerialiserUpdate
 
-
+from person.utils import CustomAPIException
 class PersonViewSet(viewsets.ModelViewSet):
     """
     Viewset for Person model
@@ -35,10 +36,11 @@ class PersonViewSet(viewsets.ModelViewSet):
         return Response(serializer.data['id'], status=status.HTTP_201_CREATED)
 
     def retrieve(self, request, pk=None):
-        instance = self.get_object()
-        if not instance:
-            return Response({'message':'person not found'}, status=status.HTTP_404_NOT_FOUND)
-        
+        try:
+            instance = self.get_object()
+        except:
+            raise CustomAPIException({'message': 'person no found'}, status_code=status.HTTP_404_NOT_FOUND)
+
         serializer = PersonSerializer(instance)
         return Response(serializer.data)
 
@@ -48,12 +50,10 @@ class PersonViewSet(viewsets.ModelViewSet):
             input_image = request.FILES['image']
             im = Image.open(input_image)
             im.verify()
-            im = Image.open(input_image) #reopen after verify
-            im = im.resize((300,300))
         except Exception as exc:
-            return  Response({'message': 'invalid image'}, status=status.HTTP_400_BAD_REQUEST)
-
-        string_vector = get_string_vector(im)
+            raise CustomAPIException({'message': 'invalid image'}, status_code=status.HTTP_400_BAD_REQUEST)
+  
+        string_vector = get_string_vector(input_image)
         serializer = PersonSerialiserUpdate(instance, {'vector': string_vector}, partial=True)
         if serializer.is_valid(raise_exception=True):
             self.perform_update(serializer)
@@ -66,14 +66,14 @@ def compare(request):
         person1 = Person.objects.get(pk=request.GET['person1'])
         person2 = Person.objects.get(pk=request.GET['person2'])
     except MultiValueDictKeyError:
-        return Response({'message': 'invalid parameters'}, status=status.HTTP_400_BAD_REQUEST)
+        raise CustomAPIException({'message': 'invalid parameters'}, status=status.HTTP_400_BAD_REQUEST)
     except ValidationError:
-        return Response({'message': 'invalid uuid'}, status=status.HTTP_400_BAD_REQUEST)
+        raise CustomAPIException({'message': 'invalid uuid'}, status=status.HTTP_400_BAD_REQUEST)
     except Person.DoesNotExist:
-        return Response({'message': 'person not found'}, status=status.HTTP_404_NOT_FOUND)
+        raise CustomAPIException({'message': 'person not found'}, status=status.HTTP_404_NOT_FOUND)
    
     if person1.vector and person2.vector:
         result = compare_vector(person1.vector, person2.vector)
         return Response({"result": result})
     else:
-         return Response({'message': 'vector is not exist'}, status=status.HTTP_404_NOT_FOUND)
+         return Response({'message': 'vector does not exist'}, status=status.HTTP_404_NOT_FOUND)
