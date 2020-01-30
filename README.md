@@ -74,3 +74,13 @@ $ python3 manage.py runserver
 `DELETE /person/id/`
 
     curl --request DELETE 'http://localhost:8000/person/ecebd15e-fa62-43ce-9fe9-9bf95c81921b/' -H 'Content-Type: application/json'
+
+
+
+## Сравнить вектора двух Person 
+
+### Request
+
+`GET /compare/?person1=id&person2=id`
+
+    curl --request GET 'http://localhost:8000/compare/?person1=ecebd15e-fa62-43ce-9fe9-9bf95c81921b&person2=ecebd15e-fa62-43ce-9fe9-9bf95c81921b& -H 'Content-Type: application/json'

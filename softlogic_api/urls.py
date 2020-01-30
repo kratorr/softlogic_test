@@ -26,5 +26,5 @@ router.register('person', views.PersonViewSet, basename='person')
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
     path('', include(router.urls)),
-    path('compare/', views.compare)
+    #path('compare/', views.compare)
 ] 

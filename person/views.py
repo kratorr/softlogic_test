@@ -3,6 +3,7 @@ from django.http.response import HttpResponseBadRequest
 from django.core.exceptions import ValidationError
 from django.utils.datastructures import MultiValueDictKeyError
 from django.http import Http404
+from django.conf import settings
 
 from rest_framework import viewsets, status, exceptions
 from rest_framework.response import Response
@@ -17,6 +18,10 @@ from person.models import Person
 from person.serializers import PersonSerializer , PersonUUIDSeriazlier, PersonSerialiserUpdate
 
 from person.utils import CustomAPIException
+
+from rest_framework.decorators import action
+
+
 class PersonViewSet(viewsets.ModelViewSet):
     """
     Viewset for Person model
@@ -59,21 +64,18 @@ class PersonViewSet(viewsets.ModelViewSet):
             self.perform_update(serializer)
         return Response(status=status.HTTP_200_OK)
 
-
-@api_view()
-def compare(request):
-    try:
-        person1 = Person.objects.get(pk=request.GET['person1'])
-        person2 = Person.objects.get(pk=request.GET['person2'])
-    except MultiValueDictKeyError:
-        raise CustomAPIException({'message': 'invalid parameters'}, status=status.HTTP_400_BAD_REQUEST)
-    except ValidationError:
-        raise CustomAPIException({'message': 'invalid uuid'}, status=status.HTTP_400_BAD_REQUEST)
-    except Person.DoesNotExist:
-        raise CustomAPIException({'message': 'person not found'}, status=status.HTTP_404_NOT_FOUND)
-   
-    if person1.vector and person2.vector:
-        result = compare_vector(person1.vector, person2.vector)
-        return Response({"result": result})
-    else:
-         return Response({'message': 'vector does not exist'}, status=status.HTTP_404_NOT_FOUND)
+    @action(methods=['get'], detail=True, url_path='compare/(?P<pk2>{})'.format(settings.UUID_REGEXP))
+    def compare(self, request, pk2, pk=None):
+        try:
+            person1 = Person.objects.get(pk=pk)
+            person2 = Person.objects.get(pk=pk2)
+        except ValidationError:
+            raise CustomAPIException({'message': 'invalid uuid'}, status=status.HTTP_400_BAD_REQUEST)
+        except Person.DoesNotExist:
+            raise CustomAPIException({'message': 'person not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+        if person1.vector and person2.vector:
+            result = compare_vector(person1.vector, person2.vector)
+            return Response({"result": result})
+        else:
+            return Response({'message': 'vector does not exist'}, status=status.HTTP_404_NOT_FOUND)
