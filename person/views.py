@@ -7,19 +7,15 @@ from django.conf import settings
 
 from rest_framework import viewsets, status, exceptions
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import action
 from rest_framework.exceptions import APIException, NotFound
 from rest_framework.views import APIView
 
 from PIL import Image
 
-from person.utils import get_string_vector, compare_vector
+from person.utils import CustomAPIException, get_string_vector, compare_vector
 from person.models import Person
-from person.serializers import PersonSerializer , PersonUUIDSeriazlier, PersonSerialiserUpdate
-
-from person.utils import CustomAPIException
-
-from rest_framework.decorators import action
+from person.serializers import PersonSerializer, PersonUUIDSeriazlier, PersonSerialiserUpdate
 
 
 class PersonViewSet(viewsets.ModelViewSet):
@@ -30,7 +26,7 @@ class PersonViewSet(viewsets.ModelViewSet):
     serializer_class = PersonSerializer
 
     def list(self, request):
-        queryset  = Person.objects.all()
+        queryset = Person.objects.all()
         serializer = PersonUUIDSeriazlier(queryset, many=True)
         return Response(serializer.data)
 
@@ -57,7 +53,7 @@ class PersonViewSet(viewsets.ModelViewSet):
             im.verify()
         except Exception as exc:
             raise CustomAPIException({'message': 'invalid image'}, status_code=status.HTTP_400_BAD_REQUEST)
-  
+
         string_vector = get_string_vector(input_image)
         serializer = PersonSerialiserUpdate(instance, {'vector': string_vector}, partial=True)
         if serializer.is_valid(raise_exception=True):
@@ -73,7 +69,7 @@ class PersonViewSet(viewsets.ModelViewSet):
             raise CustomAPIException({'message': 'invalid uuid'}, status=status.HTTP_400_BAD_REQUEST)
         except Person.DoesNotExist:
             raise CustomAPIException({'message': 'person not found'}, status=status.HTTP_404_NOT_FOUND)
-    
+
         if person1.vector and person2.vector:
             result = compare_vector(person1.vector, person2.vector)
             return Response({"result": result})
