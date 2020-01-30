@@ -1,0 +1,5 @@
+Django==2.2.9
+djangorestframework==3.11.0
+numpy==1.18.1
+Pillow==7.0.0
+pytz==2019.3
