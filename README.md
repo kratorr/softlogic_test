@@ -81,6 +81,6 @@ $ python3 manage.py runserver
 
 ### Request
 
-`GET /compare/?person1=id&person2=id`
+`GET person/id/compare/id2/`
 
     curl --request GET 'http://localhost:8000/person/5af44f20-ec06-437f-8423-467ed9407971/compare/5af44f20-ec06-437f-8423-467ed940797c/' -H 'Content-Type: application/json'
