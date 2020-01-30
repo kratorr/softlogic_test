@@ -63,7 +63,7 @@ $ python3 manage.py runserver
 
 `PUT /person/id/`
 
-curl --request PUT 'http://localhost:8000/person/ecebd15e-fa62-43ce-9fe9-9bf95c81921b/' --form 'image=@./image.jpg'  -H 'Content-Type: multipart/form-data'
+    curl --request PUT 'http://localhost:8000/person/ecebd15e-fa62-43ce-9fe9-9bf95c81921b/' --form 'image=@./image.jpg' -H 'Content-Type: multipart/form-data'
 
  
 
@@ -73,4 +73,4 @@ curl --request PUT 'http://localhost:8000/person/ecebd15e-fa62-43ce-9fe9-9bf95c8
 
 `DELETE /thing/id`
 
-curl --request DELETE 'http://localhost:8000/person/ecebd15e-fa62-43ce-9fe9-9bf95c81921b/' -H 'Content-Type: application/json'
+    curl --request DELETE 'http://localhost:8000/person/ecebd15e-fa62-43ce-9fe9-9bf95c81921b/' -H 'Content-Type: application/json'
